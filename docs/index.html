@@ -327,6 +327,7 @@
         <button class="btn" id="loadBtn">加载股票</button>
         <button class="btn secondary" id="saveApiBtn">保存接口配置</button>
         <button class="btn" id="refreshNowBtn">立即刷新</button>
+        <button class="btn warn" id="resetApiBtn">重置接口配置</button>
         <button class="btn secondary" id="toggleAutoBtn">开启自动刷新</button>
         <label for="intervalSelect" class="status-pill">自动刷新间隔</label>
         <select id="intervalSelect">
@@ -467,6 +468,16 @@
 
     function normalizeApiBase(v) {
       const s = (v || '').trim();
+      if (!s) return DEFAULT_API_BASE;
+      if (window.location.protocol === 'https:') {
+        // Avoid mixed content and legacy local API addresses saved in localStorage.
+        if (/^http:\/\//i.test(s)) {
+          return s.replace(/^http:\/\//i, 'https://');
+        }
+        if (/127\.0\.0\.1|localhost/i.test(s)) {
+          return DEFAULT_API_BASE;
+        }
+      }
       return s || DEFAULT_API_BASE;
     }
 
@@ -483,6 +494,18 @@
       localStorage.setItem('hf_api_base', currentApiBase);
       localStorage.setItem('hf_api_key', currentApiKey);
       el('apiHint').textContent = `接口配置已保存：${currentApiBase}${currentApiKey ? ' | 已配置密钥' : ' | 未配置密钥'}`;
+    }
+
+    function resetApiSettings(showHint=true) {
+      currentApiBase = DEFAULT_API_BASE;
+      currentApiKey = '';
+      localStorage.setItem('hf_api_base', currentApiBase);
+      localStorage.removeItem('hf_api_key');
+      el('apiBaseInput').value = currentApiBase;
+      el('apiKeyInput').value = '';
+      if (showHint) {
+        el('apiHint').textContent = '接口配置已重置为推荐公网地址，请重新点击“加载股票”。';
+      }
     }
 
     function buildApiUrl(query) {
@@ -814,7 +837,7 @@
       }
     }
 
-    async function loadStock(query, showError=true) {
+    async function loadStock(query, showError=true, triedFallback=false) {
       const q = (query || '').trim();
       if (!q) return;
       const seq = ++requestSeq;
@@ -848,12 +871,23 @@
         upsertChart(data.chart.dates || [], data.chart.closes || [], data.chart.ma5 || [], data.chart.ma10 || [], data.chart.ma20 || []);
       } catch (err) {
         if (seq !== requestSeq) return;
+        const msg = String(err?.message || err || '');
+        if (!triedFallback && /Failed to fetch/i.test(msg)) {
+          // Typical cause in normal mode is stale localStorage (old API base/key).
+          resetApiSettings(false);
+          await loadStock(q, showError, true);
+          return;
+        }
         clearDashboard(`接口异常：${err.message}`);
       }
     }
 
     el('loadBtn').addEventListener('click', () => loadStock(el('stockInput').value));
     el('saveApiBtn').addEventListener('click', () => saveApiSettings());
+    el('resetApiBtn').addEventListener('click', () => {
+      resetApiSettings(true);
+      loadStock(el('stockInput').value || currentQuery, true);
+    });
     el('stockInput').addEventListener('keydown', (e) => {
       if (e.key === 'Enter') loadStock(el('stockInput').value);
     });
