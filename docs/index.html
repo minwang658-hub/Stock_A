@@ -319,7 +319,7 @@
   <div class="wrap">
     <section class="hero">
       <h1 id="title">盘中股票可视化分析</h1>
-      <p>数据源：本地接口 http://127.0.0.1:8765/api/stock</p>
+      <p>数据源：公网接口 https://stocka-production-7eff.up.railway.app/api/stock</p>
       <div class="toolbar">
         <input id="stockInput" class="input" placeholder="输入代码或名称，如 002208 或 合肥城建" />
         <input id="apiBaseInput" class="input" placeholder="API地址，如 http://127.0.0.1:8765/api/stock" style="min-width:320px" />
@@ -338,7 +338,7 @@
         <span class="status-pill" id="autoStatus">自动刷新：关闭</span>
         <span class="status-pill" id="lastUpdated">页面时间：--</span>
       </div>
-      <div class="note" id="apiHint">本地可一键启动：powershell -ExecutionPolicy Bypass -File scripts/start_dashboard.ps1；远程使用时请填写 API 地址和可选密钥。</div>
+      <div class="note" id="apiHint">公网使用说明：直接输入股票代码或名称后点击加载；如启用鉴权，请填写 API 密钥。</div>
     </section>
 
     <section class="grid">
@@ -448,7 +448,7 @@
   </div>
 
   <script>
-    const DEFAULT_API_BASE = 'http://127.0.0.1:8765/api/stock';
+    const DEFAULT_API_BASE = 'https://stocka-production-7eff.up.railway.app/api/stock';
     let priceChart = null;
     let autoTimer = null;
     let currentQuery = localStorage.getItem('hf_last_query') || '002208';
@@ -833,7 +833,7 @@
 
         const s = data.stock;
         el('title').textContent = `${s.name}（${s.code}）盘中可视化分析`;
-        el('apiHint').textContent = `数据时间：${data.ts} | 来源：本地接口`;
+        el('apiHint').textContent = `数据时间：${data.ts} | 来源：公网接口`;
 
         renderKpi(s);
         renderTech(s);
