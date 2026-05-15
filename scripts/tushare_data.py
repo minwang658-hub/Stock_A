@@ -2,21 +2,24 @@
 # -*- coding: utf-8 -*-
 """
 Tushare Pro 数据源
-Token: pRdHdexpjHTcBXXdnzaUSfqpXtRvryjjJXpAlwYpEHtzktTksDeYnybzFCeXumwI
-API:   http://121.40.135.59:8010/
+Token: 来自环境变量 TUSHARE_TOKEN
+API:   来自环境变量 TUSHARE_API_URL（可选）
 """
 
 import time
+import os
 import pandas as pd
 import tushare as ts
 
-_token = 'WPJTiXmzZgpvLAwWnYHFSvkOmsfEhiywMfRRjrKYApoXWzAMkEXjhhOgrAasftMq'
-_api_url = 'http://121.40.135.59:8010/'
+_token = os.environ.get("TUSHARE_TOKEN", "").strip()
+_api_url = os.environ.get("TUSHARE_API_URL", "http://121.40.135.59:8010/").strip()
 _pro = None
 
 def get_pro():
     global _pro
     if _pro is None:
+        if not _token:
+            raise RuntimeError("Missing TUSHARE_TOKEN environment variable")
         _pro = ts.pro_api(_token)
         _pro._DataApi__http_url = _api_url
     return _pro

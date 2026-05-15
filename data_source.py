@@ -5,18 +5,21 @@
 优先使用最稳定的接口
 """
 
-import urllib.request, json, time
+import urllib.request, json, time, os
 from datetime import datetime
 
 # ============ Tushare配置 ============
 try:
     import tushare as ts
-    _token = 'pRdHdexpjHTcBXXdnzaUSfqpXtRvryjjJXpAlwYpEHtzktTksDeYnybzFCeXumwI'
-    _api_url = 'http://121.40.135.59:8010/'
-    ts.set_token(_token)
-    _pro = ts.pro_api(_token)
-    _pro._DataApi__http_url = _api_url
-    _tushare_ok = True
+    _token = os.environ.get("TUSHARE_TOKEN", "").strip()
+    _api_url = os.environ.get("TUSHARE_API_URL", "http://121.40.135.59:8010/").strip()
+    if _token:
+        ts.set_token(_token)
+        _pro = ts.pro_api(_token)
+        _pro._DataApi__http_url = _api_url
+        _tushare_ok = True
+    else:
+        _tushare_ok = False
 except:
     _tushare_ok = False
 

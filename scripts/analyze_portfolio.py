@@ -23,8 +23,11 @@ DATA_DIR.resolve().mkdir(parents=True, exist_ok=True)
 REPORT_DIR.resolve().mkdir(parents=True, exist_ok=True)
 
 # ============ Tushare配置 ============
-_token = os.environ.get("TUSHARE_TOKEN", "pRdHdexpjHTcBXXdnzaUSfqpXtRvryjjJXpAlwYpEHtzktTksDeYnybzFCeXumwI")
+_token = os.environ.get("TUSHARE_TOKEN", "").strip()
 _api_url = os.environ.get("TUSHARE_API_URL", "http://121.40.135.59:8010/")
+
+if not _token:
+    raise RuntimeError("Missing TUSHARE_TOKEN environment variable")
 
 # 初始化
 pro = ts.pro_api(_token)

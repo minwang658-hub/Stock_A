@@ -22,7 +22,7 @@ TRADE_LOG_FILE = DATA_DIR / "trade_log.csv"
 SNAPSHOT_FILE = DATA_DIR / "daily_portfolio.json"
 
 # Tushare 配置
-TUSHARE_TOKEN = os.environ.get("TUSHARE_TOKEN", "pRdHdexpjHTcBXXdnzaUSfqpXtRvryjjJXpAlwYpEHtzktTksDeYnybzFCeXumwI")
+TUSHARE_TOKEN = os.environ.get("TUSHARE_TOKEN", "").strip()
 TUSHARE_API_URL = os.environ.get("TUSHARE_API_URL", "http://121.40.135.59:8010/")
 
 # 确保目录存在
