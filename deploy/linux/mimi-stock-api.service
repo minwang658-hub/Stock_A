@@ -1,0 +1,19 @@
+[Unit]
+Description=Mimi Stock FastAPI Service
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/mimi_stock_zoe1
+Environment=PYTHONUNBUFFERED=1
+Environment=MIMI_API_HOST=127.0.0.1
+Environment=MIMI_API_PORT=8765
+Environment=MIMI_ALLOWED_ORIGIN=https://your-frontend.example.com
+Environment=MIMI_API_KEY=change-me
+ExecStart=/usr/bin/bash /opt/mimi_stock_zoe1/deploy/linux/start_api.sh
+Restart=always
+RestartSec=5
+User=root
+
+[Install]
+WantedBy=multi-user.target

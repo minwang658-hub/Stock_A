@@ -1,0 +1,830 @@
+[
+  {
+    "date": "2026-04-20",
+    "stocks": [
+      {
+        "code": "000001",
+        "qty": 700,
+        "cost": 13.838,
+        "cost_total": 9686.6,
+        "market_value": 7749.0,
+        "floating_pnl": -1937.6
+      },
+      {
+        "code": "000651",
+        "qty": 200,
+        "cost": 39.45,
+        "cost_total": 7890.0,
+        "market_value": 7392.0,
+        "floating_pnl": -498.0
+      },
+      {
+        "code": "002415",
+        "qty": 200,
+        "cost": 35.839,
+        "cost_total": 7167.8,
+        "market_value": 6956.0,
+        "floating_pnl": -211.8
+      },
+      {
+        "code": "600036",
+        "qty": 200,
+        "cost": 39.419,
+        "cost_total": 7883.8,
+        "market_value": 7964.0,
+        "floating_pnl": 80.2
+      },
+      {
+        "code": "600115",
+        "qty": 1100,
+        "cost": 5.302,
+        "cost_total": 5832.2,
+        "market_value": 4906.0,
+        "floating_pnl": -926.2
+      },
+      {
+        "code": "600160",
+        "qty": 100,
+        "cost": 36.16,
+        "cost_total": 3616.0,
+        "market_value": 3447.0,
+        "floating_pnl": -169.0
+      },
+      {
+        "code": "600660",
+        "qty": 400,
+        "cost": 63.066,
+        "cost_total": 25226.4,
+        "market_value": 24156.0,
+        "floating_pnl": -1070.4
+      },
+      {
+        "code": "601398",
+        "qty": 1400,
+        "cost": 7.757,
+        "cost_total": 10859.8,
+        "market_value": 10584.0,
+        "floating_pnl": -275.8
+      },
+      {
+        "code": "603005",
+        "qty": 100,
+        "cost": 29.89,
+        "cost_total": 2989.0,
+        "market_value": 3101.0,
+        "floating_pnl": 112.0
+      },
+      {
+        "code": "603019",
+        "qty": 200,
+        "cost": 82.171,
+        "cost_total": 16434.2,
+        "market_value": 18384.0,
+        "floating_pnl": 1949.8
+      }
+    ],
+    "total_cost": 97585.8,
+    "total_market_value": 94639.0,
+    "floating_pnl": -2946.8,
+    "day_realized": 0,
+    "cumulative_realized": 1545.0,
+    "total_pnl": -1401.8,
+    "total_pnl_pct": -1.44
+  },
+  {
+    "date": "2026-04-20",
+    "stocks": [
+      {
+        "code": "000001",
+        "qty": 700,
+        "cost": 13.838,
+        "cost_total": 9686.6,
+        "market_value": 7742.0,
+        "floating_pnl": -1944.6
+      },
+      {
+        "code": "000651",
+        "qty": 200,
+        "cost": 39.45,
+        "cost_total": 7890.0,
+        "market_value": 7392.0,
+        "floating_pnl": -498.0
+      },
+      {
+        "code": "002415",
+        "qty": 200,
+        "cost": 35.839,
+        "cost_total": 7167.8,
+        "market_value": 6956.0,
+        "floating_pnl": -211.8
+      },
+      {
+        "code": "600036",
+        "qty": 200,
+        "cost": 39.419,
+        "cost_total": 7883.8,
+        "market_value": 7962.0,
+        "floating_pnl": 78.2
+      },
+      {
+        "code": "600115",
+        "qty": 1100,
+        "cost": 5.302,
+        "cost_total": 5832.2,
+        "market_value": 4895.0,
+        "floating_pnl": -937.2
+      },
+      {
+        "code": "600160",
+        "qty": 100,
+        "cost": 36.16,
+        "cost_total": 3616.0,
+        "market_value": 3451.0,
+        "floating_pnl": -165.0
+      },
+      {
+        "code": "600660",
+        "qty": 400,
+        "cost": 63.066,
+        "cost_total": 25226.4,
+        "market_value": 24144.0,
+        "floating_pnl": -1082.4
+      },
+      {
+        "code": "601398",
+        "qty": 1400,
+        "cost": 7.757,
+        "cost_total": 10859.8,
+        "market_value": 10570.0,
+        "floating_pnl": -289.8
+      },
+      {
+        "code": "603005",
+        "qty": 100,
+        "cost": 29.89,
+        "cost_total": 2989.0,
+        "market_value": 3104.0,
+        "floating_pnl": 115.0
+      },
+      {
+        "code": "603019",
+        "qty": 200,
+        "cost": 82.171,
+        "cost_total": 16434.2,
+        "market_value": 18416.0,
+        "floating_pnl": 1981.8
+      }
+    ],
+    "total_cost": 97585.8,
+    "total_market_value": 94632.0,
+    "floating_pnl": -2953.8,
+    "day_realized": 1545.0,
+    "cumulative_realized": 1545.0,
+    "total_pnl": -1408.8,
+    "total_pnl_pct": -1.44
+  },
+  {
+    "date": "2026-04-20",
+    "stocks": [
+      {
+        "code": "000001",
+        "qty": 700,
+        "cost": 13.838,
+        "cost_total": 9686.6,
+        "market_value": 7728.0,
+        "floating_pnl": -1958.6
+      },
+      {
+        "code": "000651",
+        "qty": 200,
+        "cost": 39.45,
+        "cost_total": 7890.0,
+        "market_value": 7382.0,
+        "floating_pnl": -508.0
+      },
+      {
+        "code": "002415",
+        "qty": 200,
+        "cost": 35.839,
+        "cost_total": 7167.8,
+        "market_value": 6902.0,
+        "floating_pnl": -265.8
+      },
+      {
+        "code": "600036",
+        "qty": 200,
+        "cost": 39.419,
+        "cost_total": 7883.8,
+        "market_value": 7964.0,
+        "floating_pnl": 80.2
+      },
+      {
+        "code": "600115",
+        "qty": 1100,
+        "cost": 5.302,
+        "cost_total": 5832.2,
+        "market_value": 5060.0,
+        "floating_pnl": -772.2
+      },
+      {
+        "code": "600160",
+        "qty": 100,
+        "cost": 36.16,
+        "cost_total": 3616.0,
+        "market_value": 3443.0,
+        "floating_pnl": -173.0
+      },
+      {
+        "code": "600660",
+        "qty": 400,
+        "cost": 63.066,
+        "cost_total": 25226.4,
+        "market_value": 24104.0,
+        "floating_pnl": -1122.4
+      },
+      {
+        "code": "601398",
+        "qty": 1400,
+        "cost": 7.757,
+        "cost_total": 10859.8,
+        "market_value": 10556.0,
+        "floating_pnl": -303.8
+      },
+      {
+        "code": "603005",
+        "qty": 100,
+        "cost": 29.89,
+        "cost_total": 2989.0,
+        "market_value": 3063.0,
+        "floating_pnl": 74.0
+      },
+      {
+        "code": "603019",
+        "qty": 200,
+        "cost": 82.171,
+        "cost_total": 16434.2,
+        "market_value": 18368.0,
+        "floating_pnl": 1933.8
+      }
+    ],
+    "total_cost": 97585.8,
+    "total_market_value": 94570.0,
+    "floating_pnl": -3015.8,
+    "day_realized": 1545.0,
+    "cumulative_realized": 1545.0,
+    "total_pnl": -1470.8,
+    "total_pnl_pct": -1.51
+  },
+  {
+    "date": "2026-04-20",
+    "stocks": [
+      {
+        "code": "000001",
+        "qty": 700,
+        "cost": 13.838,
+        "cost_total": 9686.6,
+        "market_value": 7728.0,
+        "floating_pnl": -1958.6
+      },
+      {
+        "code": "000651",
+        "qty": 200,
+        "cost": 39.45,
+        "cost_total": 7890.0,
+        "market_value": 7380.0,
+        "floating_pnl": -510.0
+      },
+      {
+        "code": "002415",
+        "qty": 200,
+        "cost": 35.839,
+        "cost_total": 7167.8,
+        "market_value": 6904.0,
+        "floating_pnl": -263.8
+      },
+      {
+        "code": "600036",
+        "qty": 200,
+        "cost": 39.419,
+        "cost_total": 7883.8,
+        "market_value": 7958.0,
+        "floating_pnl": 74.2
+      },
+      {
+        "code": "600115",
+        "qty": 1100,
+        "cost": 5.302,
+        "cost_total": 5832.2,
+        "market_value": 5049.0,
+        "floating_pnl": -783.2
+      },
+      {
+        "code": "600160",
+        "qty": 100,
+        "cost": 36.16,
+        "cost_total": 3616.0,
+        "market_value": 3446.0,
+        "floating_pnl": -170.0
+      },
+      {
+        "code": "600660",
+        "qty": 400,
+        "cost": 63.066,
+        "cost_total": 25226.4,
+        "market_value": 24096.0,
+        "floating_pnl": -1130.4
+      },
+      {
+        "code": "601398",
+        "qty": 1400,
+        "cost": 7.757,
+        "cost_total": 10859.8,
+        "market_value": 10584.0,
+        "floating_pnl": -275.8
+      },
+      {
+        "code": "603005",
+        "qty": 100,
+        "cost": 29.89,
+        "cost_total": 2989.0,
+        "market_value": 3064.0,
+        "floating_pnl": 75.0
+      },
+      {
+        "code": "603019",
+        "qty": 200,
+        "cost": 82.171,
+        "cost_total": 16434.2,
+        "market_value": 18370.0,
+        "floating_pnl": 1935.8
+      }
+    ],
+    "total_cost": 97585.8,
+    "total_market_value": 94579.0,
+    "floating_pnl": -3006.8,
+    "day_realized": 1545.0,
+    "cumulative_realized": 1545.0,
+    "total_pnl": -1461.8,
+    "total_pnl_pct": -1.5
+  },
+  {
+    "date": "2026-04-20",
+    "stocks": [
+      {
+        "code": "000001",
+        "qty": 700,
+        "cost": 13.838,
+        "cost_total": 9686.6,
+        "market_value": 7721.0,
+        "floating_pnl": -1965.6
+      },
+      {
+        "code": "000651",
+        "qty": 200,
+        "cost": 39.45,
+        "cost_total": 7890.0,
+        "market_value": 7380.0,
+        "floating_pnl": -510.0
+      },
+      {
+        "code": "002415",
+        "qty": 200,
+        "cost": 35.839,
+        "cost_total": 7167.8,
+        "market_value": 6904.0,
+        "floating_pnl": -263.8
+      },
+      {
+        "code": "600036",
+        "qty": 200,
+        "cost": 39.419,
+        "cost_total": 7883.8,
+        "market_value": 7958.0,
+        "floating_pnl": 74.2
+      },
+      {
+        "code": "600115",
+        "qty": 1100,
+        "cost": 5.302,
+        "cost_total": 5832.2,
+        "market_value": 5038.0,
+        "floating_pnl": -794.2
+      },
+      {
+        "code": "600160",
+        "qty": 100,
+        "cost": 36.16,
+        "cost_total": 3616.0,
+        "market_value": 3445.0,
+        "floating_pnl": -171.0
+      },
+      {
+        "code": "600660",
+        "qty": 400,
+        "cost": 63.066,
+        "cost_total": 25226.4,
+        "market_value": 24100.0,
+        "floating_pnl": -1126.4
+      },
+      {
+        "code": "601398",
+        "qty": 1400,
+        "cost": 7.757,
+        "cost_total": 10859.8,
+        "market_value": 10570.0,
+        "floating_pnl": -289.8
+      },
+      {
+        "code": "603005",
+        "qty": 100,
+        "cost": 29.89,
+        "cost_total": 2989.0,
+        "market_value": 3066.0,
+        "floating_pnl": 77.0
+      },
+      {
+        "code": "603019",
+        "qty": 200,
+        "cost": 82.171,
+        "cost_total": 16434.2,
+        "market_value": 18364.0,
+        "floating_pnl": 1929.8
+      }
+    ],
+    "total_cost": 97585.8,
+    "total_market_value": 94546.0,
+    "floating_pnl": -3039.8,
+    "day_realized": 1545.0,
+    "cumulative_realized": 1545.0,
+    "total_pnl": -1494.8,
+    "total_pnl_pct": -1.53
+  },
+  {
+    "date": "2026-04-20",
+    "stocks": [
+      {
+        "code": "000001",
+        "qty": 700,
+        "cost": 13.838,
+        "cost_total": 9686.6,
+        "market_value": 7735.0,
+        "floating_pnl": -1951.6
+      },
+      {
+        "code": "000651",
+        "qty": 200,
+        "cost": 39.45,
+        "cost_total": 7890.0,
+        "market_value": 7390.0,
+        "floating_pnl": -500.0
+      },
+      {
+        "code": "002415",
+        "qty": 200,
+        "cost": 35.839,
+        "cost_total": 7167.8,
+        "market_value": 6930.0,
+        "floating_pnl": -237.8
+      },
+      {
+        "code": "600036",
+        "qty": 200,
+        "cost": 39.419,
+        "cost_total": 7883.8,
+        "market_value": 7970.0,
+        "floating_pnl": 86.2
+      },
+      {
+        "code": "600115",
+        "qty": 1100,
+        "cost": 5.302,
+        "cost_total": 5832.2,
+        "market_value": 5049.0,
+        "floating_pnl": -783.2
+      },
+      {
+        "code": "600160",
+        "qty": 100,
+        "cost": 36.16,
+        "cost_total": 3616.0,
+        "market_value": 3452.0,
+        "floating_pnl": -164.0
+      },
+      {
+        "code": "600660",
+        "qty": 400,
+        "cost": 63.066,
+        "cost_total": 25226.4,
+        "market_value": 24088.0,
+        "floating_pnl": -1138.4
+      },
+      {
+        "code": "601398",
+        "qty": 1400,
+        "cost": 7.757,
+        "cost_total": 10859.8,
+        "market_value": 10598.0,
+        "floating_pnl": -261.8
+      },
+      {
+        "code": "603005",
+        "qty": 100,
+        "cost": 29.89,
+        "cost_total": 2989.0,
+        "market_value": 3081.0,
+        "floating_pnl": 92.0
+      },
+      {
+        "code": "603019",
+        "qty": 200,
+        "cost": 82.171,
+        "cost_total": 16434.2,
+        "market_value": 18394.0,
+        "floating_pnl": 1959.8
+      }
+    ],
+    "total_cost": 97585.8,
+    "total_market_value": 94687.0,
+    "floating_pnl": -2898.8,
+    "day_realized": 1545.0,
+    "cumulative_realized": 1545.0,
+    "total_pnl": -1353.8,
+    "total_pnl_pct": -1.39
+  },
+  {
+    "date": "2026-04-20",
+    "stocks": [
+      {
+        "code": "000001",
+        "qty": 700,
+        "cost": 13.838,
+        "cost_total": 9686.6,
+        "market_value": 7742.0,
+        "floating_pnl": -1944.6
+      },
+      {
+        "code": "000651",
+        "qty": 200,
+        "cost": 39.45,
+        "cost_total": 7890.0,
+        "market_value": 7388.0,
+        "floating_pnl": -502.0
+      },
+      {
+        "code": "002415",
+        "qty": 200,
+        "cost": 35.839,
+        "cost_total": 7167.8,
+        "market_value": 6902.0,
+        "floating_pnl": -265.8
+      },
+      {
+        "code": "600036",
+        "qty": 200,
+        "cost": 39.419,
+        "cost_total": 7883.8,
+        "market_value": 7974.0,
+        "floating_pnl": 90.2
+      },
+      {
+        "code": "600115",
+        "qty": 1100,
+        "cost": 5.302,
+        "cost_total": 5832.2,
+        "market_value": 5049.0,
+        "floating_pnl": -783.2
+      },
+      {
+        "code": "600160",
+        "qty": 100,
+        "cost": 36.16,
+        "cost_total": 3616.0,
+        "market_value": 3446.0,
+        "floating_pnl": -170.0
+      },
+      {
+        "code": "600660",
+        "qty": 400,
+        "cost": 63.066,
+        "cost_total": 25226.4,
+        "market_value": 24064.0,
+        "floating_pnl": -1162.4
+      },
+      {
+        "code": "601398",
+        "qty": 1400,
+        "cost": 7.757,
+        "cost_total": 10859.8,
+        "market_value": 10598.0,
+        "floating_pnl": -261.8
+      },
+      {
+        "code": "603005",
+        "qty": 100,
+        "cost": 29.89,
+        "cost_total": 2989.0,
+        "market_value": 3081.0,
+        "floating_pnl": 92.0
+      },
+      {
+        "code": "603019",
+        "qty": 200,
+        "cost": 82.171,
+        "cost_total": 16434.2,
+        "market_value": 18394.0,
+        "floating_pnl": 1959.8
+      }
+    ],
+    "total_cost": 97585.8,
+    "total_market_value": 94638.0,
+    "floating_pnl": -2947.8,
+    "day_realized": 1545.0,
+    "cumulative_realized": 1545.0,
+    "total_pnl": -1402.8,
+    "total_pnl_pct": -1.44
+  },
+  {
+    "date": "2026-04-20",
+    "stocks": [
+      {
+        "code": "000001",
+        "qty": 700,
+        "cost": 13.838,
+        "cost_total": 9686.6,
+        "market_value": 7742.0,
+        "floating_pnl": -1944.6
+      },
+      {
+        "code": "000651",
+        "qty": 200,
+        "cost": 39.45,
+        "cost_total": 7890.0,
+        "market_value": 7388.0,
+        "floating_pnl": -502.0
+      },
+      {
+        "code": "002415",
+        "qty": 200,
+        "cost": 35.839,
+        "cost_total": 7167.8,
+        "market_value": 6902.0,
+        "floating_pnl": -265.8
+      },
+      {
+        "code": "600036",
+        "qty": 200,
+        "cost": 39.419,
+        "cost_total": 7883.8,
+        "market_value": 7974.0,
+        "floating_pnl": 90.2
+      },
+      {
+        "code": "600115",
+        "qty": 1100,
+        "cost": 5.302,
+        "cost_total": 5832.2,
+        "market_value": 5049.0,
+        "floating_pnl": -783.2
+      },
+      {
+        "code": "600160",
+        "qty": 100,
+        "cost": 36.16,
+        "cost_total": 3616.0,
+        "market_value": 3446.0,
+        "floating_pnl": -170.0
+      },
+      {
+        "code": "600660",
+        "qty": 400,
+        "cost": 63.066,
+        "cost_total": 25226.4,
+        "market_value": 24064.0,
+        "floating_pnl": -1162.4
+      },
+      {
+        "code": "601398",
+        "qty": 1400,
+        "cost": 7.757,
+        "cost_total": 10859.8,
+        "market_value": 10598.0,
+        "floating_pnl": -261.8
+      },
+      {
+        "code": "603005",
+        "qty": 100,
+        "cost": 29.89,
+        "cost_total": 2989.0,
+        "market_value": 3081.0,
+        "floating_pnl": 92.0
+      },
+      {
+        "code": "603019",
+        "qty": 200,
+        "cost": 82.171,
+        "cost_total": 16434.2,
+        "market_value": 18394.0,
+        "floating_pnl": 1959.8
+      }
+    ],
+    "total_cost": 97585.8,
+    "total_market_value": 94638.0,
+    "floating_pnl": -2947.8,
+    "day_realized": 1545.0,
+    "cumulative_realized": 1545.0,
+    "total_pnl": -1402.8,
+    "total_pnl_pct": -1.44
+  },
+  {
+    "date": "2026-04-20",
+    "stocks": [
+      {
+        "code": "000001",
+        "qty": 700,
+        "cost": 13.838,
+        "cost_total": 9686.6,
+        "market_value": 7742.0,
+        "floating_pnl": -1944.6
+      },
+      {
+        "code": "000651",
+        "qty": 200,
+        "cost": 39.45,
+        "cost_total": 7890.0,
+        "market_value": 7388.0,
+        "floating_pnl": -502.0
+      },
+      {
+        "code": "002415",
+        "qty": 200,
+        "cost": 35.839,
+        "cost_total": 7167.8,
+        "market_value": 6902.0,
+        "floating_pnl": -265.8
+      },
+      {
+        "code": "600036",
+        "qty": 200,
+        "cost": 39.419,
+        "cost_total": 7883.8,
+        "market_value": 7974.0,
+        "floating_pnl": 90.2
+      },
+      {
+        "code": "600115",
+        "qty": 1100,
+        "cost": 5.302,
+        "cost_total": 5832.2,
+        "market_value": 5049.0,
+        "floating_pnl": -783.2
+      },
+      {
+        "code": "600160",
+        "qty": 100,
+        "cost": 36.16,
+        "cost_total": 3616.0,
+        "market_value": 3446.0,
+        "floating_pnl": -170.0
+      },
+      {
+        "code": "600660",
+        "qty": 400,
+        "cost": 63.066,
+        "cost_total": 25226.4,
+        "market_value": 24064.0,
+        "floating_pnl": -1162.4
+      },
+      {
+        "code": "601398",
+        "qty": 1400,
+        "cost": 7.757,
+        "cost_total": 10859.8,
+        "market_value": 10598.0,
+        "floating_pnl": -261.8
+      },
+      {
+        "code": "603005",
+        "qty": 100,
+        "cost": 29.89,
+        "cost_total": 2989.0,
+        "market_value": 3081.0,
+        "floating_pnl": 92.0
+      },
+      {
+        "code": "603019",
+        "qty": 200,
+        "cost": 82.171,
+        "cost_total": 16434.2,
+        "market_value": 18394.0,
+        "floating_pnl": 1959.8
+      }
+    ],
+    "total_cost": 97585.8,
+    "total_market_value": 94638.0,
+    "floating_pnl": -2947.8,
+    "day_realized": 1545.0,
+    "cumulative_realized": 1545.0,
+    "total_pnl": -1402.8,
+    "total_pnl_pct": -1.44
+  }
+]

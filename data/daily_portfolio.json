@@ -1,0 +1,58 @@
+[
+  {
+    "date": "2026-04-28",
+    "stocks": [
+      {
+        "code": "002036",
+        "qty": 600,
+        "cost": 8.15,
+        "cost_total": 4890.0,
+        "market_value": 4890.0,
+        "floating_pnl": 0.0
+      },
+      {
+        "code": "300015",
+        "qty": 200,
+        "cost": 11.04,
+        "cost_total": 2208.0,
+        "market_value": 2168.0,
+        "floating_pnl": -40.0
+      }
+    ],
+    "total_cost": 7098.0,
+    "total_market_value": 7058.0,
+    "floating_pnl": -40.0,
+    "day_realized": 0.0,
+    "cumulative_realized": 0.0,
+    "total_pnl": -40.0,
+    "total_pnl_pct": -0.56
+  },
+  {
+    "date": "2026-04-28",
+    "stocks": [
+      {
+        "code": "002036",
+        "qty": 600,
+        "cost": 8.15,
+        "cost_total": 4890.0,
+        "market_value": 4890.0,
+        "floating_pnl": 0.0
+      },
+      {
+        "code": "300015",
+        "qty": 200,
+        "cost": 11.04,
+        "cost_total": 2208.0,
+        "market_value": 2192.0,
+        "floating_pnl": -16.0
+      }
+    ],
+    "total_cost": 7098.0,
+    "total_market_value": 7082.0,
+    "floating_pnl": -16.0,
+    "day_realized": 0.0,
+    "cumulative_realized": 0.0,
+    "total_pnl": -16.0,
+    "total_pnl_pct": -0.23
+  }
+]

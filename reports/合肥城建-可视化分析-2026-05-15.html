@@ -1,0 +1,871 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>盘中股票可视化分析</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --ink: #14213d;
+      --muted: #4f5d75;
+      --card: #ffffff;
+      --rise: #d62828;
+      --fall: #2a9d8f;
+      --warn: #f77f00;
+      --line: #1d3557;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 90% 10%, rgba(255, 183, 3, 0.16), transparent 36%),
+        radial-gradient(circle at 10% 90%, rgba(42, 157, 143, 0.12), transparent 34%),
+        var(--bg);
+      min-height: 100vh;
+    }
+
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 24px; }
+
+    .hero {
+      background: linear-gradient(120deg, #0b132b, #1c2541 65%, #3a506b);
+      color: #f8f9fa;
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 12px 30px rgba(11, 19, 43, 0.25);
+    }
+
+    .hero h1 { margin: 0; font-size: 28px; }
+    .hero p { margin: 8px 0 0; color: #dce3f1; }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-top: 14px;
+    }
+
+    .input {
+      border: 1px solid #d1d9e6;
+      border-radius: 8px;
+      padding: 7px 8px;
+      min-width: 180px;
+      color: #33415c;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 13px;
+      cursor: pointer;
+      background: #1d3557;
+      color: #fff;
+    }
+
+    .btn.secondary { background: #2a9d8f; }
+    .btn.warn { background: #f77f00; color: #1f2937; font-weight: 600; }
+
+    .toolbar select {
+      border: 1px solid #d1d9e6;
+      background: #fff;
+      border-radius: 8px;
+      padding: 7px 8px;
+      color: #33415c;
+    }
+
+    .status-pill {
+      display: inline-block;
+      font-size: 12px;
+      background: #f2f7ff;
+      color: #33415c;
+      border: 1px solid #d7e3ff;
+      border-radius: 999px;
+      padding: 5px 10px;
+    }
+
+    .grid {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 6px 16px rgba(19, 36, 68, 0.08);
+    }
+
+    .label { color: var(--muted); font-size: 13px; margin-bottom: 6px; }
+    .value { font-size: 24px; font-weight: 700; line-height: 1.2; }
+    .rise { color: var(--rise); }
+    .fall { color: var(--fall); }
+
+    .panel {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: 2.1fr 1fr;
+      gap: 14px;
+    }
+
+    .sub h3 { margin: 0 0 8px; font-size: 16px; }
+    canvas { width: 100% !important; height: 340px !important; }
+
+    .zones { margin-top: 10px; padding: 0; list-style: none; font-size: 14px; line-height: 1.8; }
+    .zones li span { display: inline-block; min-width: 86px; color: var(--muted); }
+
+    .section-title { margin: 18px 0 8px; font-size: 18px; color: #1c2541; font-weight: 700; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 14px;
+      background: var(--card);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 6px 16px rgba(19, 36, 68, 0.08);
+    }
+
+    th, td { padding: 10px 12px; border-bottom: 1px solid #e8edf5; text-align: left; }
+    th { background: #edf2fb; color: #33415c; font-weight: 600; }
+    tr:last-child td { border-bottom: none; }
+
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 12px; }
+    .list { margin: 0; padding-left: 18px; line-height: 1.8; font-size: 14px; }
+
+    .signal-box {
+      margin-top: 12px;
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #e6edf8;
+      padding: 10px 12px;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .kpi-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 10px; }
+    .kpi-chip { background: #f8fbff; border: 1px solid #e3ecfb; border-radius: 10px; padding: 8px 10px; font-size: 13px; }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #fff2cf;
+      color: #8a5a00;
+      font-size: 12px;
+      margin-right: 6px;
+      margin-top: 6px;
+    }
+
+    .note {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #5b6478;
+      background: #eef4ff;
+      border-left: 4px solid #457b9d;
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+
+    .fact-box {
+      margin-top: 10px;
+      background: #f8fbff;
+      border: 1px solid #e3ecfb;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 13px;
+      color: #33415c;
+    }
+
+    .fact-title {
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .source-line {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #5c677d;
+    }
+
+    .foot { margin-top: 12px; color: #5c677d; font-size: 12px; }
+
+    .fact-summary {
+      margin-bottom: 8px;
+      font-size: 13px;
+      color: #33415c;
+    }
+
+    .badge {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 12px;
+      margin-right: 6px;
+      border: 1px solid #d7e3ff;
+      background: #f2f7ff;
+      color: #33415c;
+    }
+
+    .badge.high { background: #ffe6e6; border-color: #ffb3b3; color: #a61b1b; }
+    .badge.mid { background: #fff6e8; border-color: #ffd9a3; color: #9a5b00; }
+    .badge.low { background: #edf7ef; border-color: #bfe3c4; color: #1f6f3f; }
+
+    .small-note {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #5c677d;
+    }
+
+    .strategy-board {
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 14px;
+    }
+
+    .strategy-hero {
+      background: linear-gradient(135deg, #102542, #183153 60%, #325c80);
+      color: #f8fbff;
+      border-radius: 20px;
+      padding: 18px;
+      box-shadow: 0 14px 32px rgba(16, 37, 66, 0.22);
+    }
+
+    .strategy-hero h3 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .strategy-sub {
+      margin-top: 6px;
+      color: #d4e2f6;
+      font-size: 14px;
+    }
+
+    .scenario-chip {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .scenario-chip.red { background: #ffdede; color: #9f1c1c; }
+    .scenario-chip.amber { background: #fff1d6; color: #9a6300; }
+    .scenario-chip.green { background: #dcf5e6; color: #1f6f3f; }
+
+    .signal-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .signal-card {
+      background: rgba(255, 255, 255, 0.09);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    .signal-card .mini-label {
+      font-size: 12px;
+      color: #c9d8ee;
+    }
+
+    .signal-card .mini-value {
+      margin-top: 6px;
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .scenario-panel {
+      background: #fffdf7;
+      border: 1px solid #f4e2b9;
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .scenario-panel h3 {
+      margin: 0;
+      color: #6a4a00;
+    }
+
+    .reason-list li {
+      margin-bottom: 6px;
+    }
+
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .panel { grid-template-columns: 1fr; }
+      .two-col { grid-template-columns: 1fr; }
+      .strategy-board { grid-template-columns: 1fr; }
+      canvas { height: 280px !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <h1 id="title">盘中股票可视化分析</h1>
+      <p>数据源：本地接口 http://127.0.0.1:8765/api/stock</p>
+      <div class="toolbar">
+        <input id="stockInput" class="input" placeholder="输入代码或名称，如 002208 或 合肥城建" />
+        <input id="apiBaseInput" class="input" placeholder="API地址，如 http://127.0.0.1:8765/api/stock" style="min-width:320px" />
+        <input id="apiKeyInput" class="input" placeholder="API密钥，可留空" style="min-width:180px" />
+        <button class="btn" id="loadBtn">加载股票</button>
+        <button class="btn secondary" id="saveApiBtn">保存接口配置</button>
+        <button class="btn" id="refreshNowBtn">立即刷新</button>
+        <button class="btn secondary" id="toggleAutoBtn">开启自动刷新</button>
+        <label for="intervalSelect" class="status-pill">自动刷新间隔</label>
+        <select id="intervalSelect">
+          <option value="15">15秒</option>
+          <option value="30" selected>30秒</option>
+          <option value="60">60秒</option>
+          <option value="120">120秒</option>
+        </select>
+        <span class="status-pill" id="autoStatus">自动刷新：关闭</span>
+        <span class="status-pill" id="lastUpdated">页面时间：--</span>
+      </div>
+      <div class="note" id="apiHint">本地可一键启动：powershell -ExecutionPolicy Bypass -File scripts/start_dashboard.ps1；远程使用时请填写 API 地址和可选密钥。</div>
+    </section>
+
+    <section class="grid">
+      <div class="card"><div class="label">最新价</div><div class="value" id="kpiPrice">--</div></div>
+      <div class="card"><div class="label">当日涨跌</div><div class="value" id="kpiPct">--</div></div>
+      <div class="card"><div class="label">5日涨幅</div><div class="value" id="kpi5d">--</div></div>
+      <div class="card"><div class="label">20日涨幅</div><div class="value" id="kpi20d">--</div></div>
+    </section>
+
+    <section class="panel">
+      <div class="card sub">
+        <h3>120日价格与均线</h3>
+        <canvas id="priceChart"></canvas>
+      </div>
+      <div class="card sub">
+        <h3>技术摘要</h3>
+        <ul class="zones" id="techList"></ul>
+      </div>
+    </section>
+
+    <div class="section-title">市场信息与板块对照</div>
+    <table>
+      <thead><tr><th>市场/标的</th><th>点位/价格</th><th>涨跌幅</th><th>备注</th></tr></thead>
+      <tbody id="indexTbody"></tbody>
+    </table>
+
+    <div class="two-col">
+      <div class="card">
+        <h3 style="margin-top:0">资金走向（盘中）</h3>
+        <div class="kpi-row" id="flowKpi"></div>
+        <div class="signal-box" id="flowSignalBox"></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0">政策与事件线索</h3>
+        <ul class="list" id="policyList"></ul>
+      </div>
+    </div>
+
+    <div class="section-title">财报与基本面</div>
+    <table>
+      <thead><tr><th>层级</th><th>期间</th><th>营收</th><th>净利润</th><th>同比</th><th>关键指标</th></tr></thead>
+      <tbody id="finTbody"></tbody>
+    </table>
+
+    <div class="section-title">热度核心资讯解读</div>
+    <div class="card">
+      <div id="hotTags"></div>
+      <ul class="list" id="hotList"></ul>
+      <div class="note" id="hotCapital"></div>
+      <ul class="list" id="hotRisk"></ul>
+    </div>
+
+    <div class="section-title">短期核心信息（1-3天）</div>
+    <div class="strategy-board">
+      <div class="strategy-hero">
+        <h3 id="scenarioHeadline">当前情景：--</h3>
+        <div class="strategy-sub" id="scenarioSummary">--</div>
+        <div class="scenario-chip amber" id="scenarioChip">策略信号：--</div>
+        <div class="signal-grid">
+          <div class="signal-card">
+            <div class="mini-label">主线题材</div>
+            <div class="mini-value" id="shortTopic">--</div>
+          </div>
+          <div class="signal-card">
+            <div class="mini-label">操作倾向</div>
+            <div class="mini-value" id="shortBias">--</div>
+          </div>
+          <div class="signal-card">
+            <div class="mini-label">风险等级</div>
+            <div class="mini-value" id="shortRisk">--</div>
+          </div>
+          <div class="signal-card">
+            <div class="mini-label">资金态度</div>
+            <div class="mini-value" id="shortFlowState">--</div>
+          </div>
+        </div>
+      </div>
+      <div class="scenario-panel">
+        <h3>为什么这样判定</h3>
+        <ul class="list reason-list" id="scenarioReasons"></ul>
+        <div class="note" id="scenarioAction">--</div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:12px;">
+      <div class="kpi-row" id="shortCoreKpi"></div>
+      <ul class="list" id="shortCorePoints"></ul>
+      <ul class="list" id="shortCoreWatch"></ul>
+    </div>
+
+    <div class="section-title">事实事件时间线</div>
+    <div class="card">
+      <div class="fact-summary" id="factSummary">--</div>
+      <div class="small-note" id="dedupSummary">--</div>
+      <ul class="list" id="topicGroupList"></ul>
+      <table>
+        <thead><tr><th>时间</th><th>类型</th><th>事件</th><th>来源</th><th>影响</th><th>可信度</th></tr></thead>
+        <tbody id="factTbody"></tbody>
+      </table>
+      <div class="small-note">可信度规则</div>
+      <ul class="list" id="credibilityRuleList"></ul>
+    </div>
+
+    <div class="section-title">多角度深度解读</div>
+    <div class="two-col" id="multiAngleGrid"></div>
+
+    <div class="foot">提示：该页用于可视化复盘，不构成投资建议。</div>
+  </div>
+
+  <script>
+    const DEFAULT_API_BASE = 'http://127.0.0.1:8765/api/stock';
+    let priceChart = null;
+    let autoTimer = null;
+    let currentQuery = localStorage.getItem('hf_last_query') || '002208';
+    let currentApiBase = DEFAULT_API_BASE;
+    let currentApiKey = '';
+
+    const el = (id) => document.getElementById(id);
+    const fmt = (v, d=2) => (v === null || v === undefined || Number.isNaN(Number(v))) ? '--' : Number(v).toFixed(d);
+    const fmtPct = (v) => (v === null || v === undefined || Number.isNaN(Number(v))) ? '--' : `${Number(v) >= 0 ? '+' : ''}${Number(v).toFixed(2)}%`;
+    const fmtYi = (v) => (v === null || v === undefined || Number.isNaN(Number(v))) ? '--' : `${Number(v).toFixed(2)}亿`;
+
+    function getUrlParam(name) {
+      return new URLSearchParams(window.location.search).get(name) || '';
+    }
+
+    function normalizeApiBase(v) {
+      const s = (v || '').trim();
+      return s || DEFAULT_API_BASE;
+    }
+
+    function loadApiSettings() {
+      currentApiBase = normalizeApiBase(getUrlParam('api') || localStorage.getItem('hf_api_base') || DEFAULT_API_BASE);
+      currentApiKey = (getUrlParam('key') || localStorage.getItem('hf_api_key') || '').trim();
+      el('apiBaseInput').value = currentApiBase;
+      el('apiKeyInput').value = currentApiKey;
+    }
+
+    function saveApiSettings() {
+      currentApiBase = normalizeApiBase(el('apiBaseInput').value);
+      currentApiKey = (el('apiKeyInput').value || '').trim();
+      localStorage.setItem('hf_api_base', currentApiBase);
+      localStorage.setItem('hf_api_key', currentApiKey);
+      el('apiHint').textContent = `接口配置已保存：${currentApiBase}${currentApiKey ? ' | 已配置密钥' : ' | 未配置密钥'}`;
+    }
+
+    function buildApiUrl(query) {
+      const q = (query || '').trim();
+      const keyPart = currentApiKey ? `&key=${encodeURIComponent(currentApiKey)}` : '';
+      return `${currentApiBase}?${q.match(/^\d{6}$/) ? 'code' : 'query'}=${encodeURIComponent(q)}${keyPart}`;
+    }
+
+    function updateTimeLabel() {
+      const ts = new Date().toLocaleString('zh-CN', { hour12: false });
+      el('lastUpdated').textContent = `页面时间：${ts}`;
+    }
+
+    function setColorBySign(dom, val) {
+      dom.classList.remove('rise', 'fall');
+      if (Number(val) > 0) dom.classList.add('rise');
+      if (Number(val) < 0) dom.classList.add('fall');
+    }
+
+    function setAutoStatus(on) {
+      el('autoStatus').textContent = on ? `自动刷新：开启（${el('intervalSelect').value}秒）` : '自动刷新：关闭';
+      el('toggleAutoBtn').textContent = on ? '关闭自动刷新' : '开启自动刷新';
+      el('toggleAutoBtn').className = on ? 'btn warn' : 'btn secondary';
+    }
+
+    function startAutoRefresh() {
+      stopAutoRefresh();
+      const sec = Number(el('intervalSelect').value || 30);
+      autoTimer = setInterval(() => loadStock(currentQuery, false), sec * 1000);
+      localStorage.setItem('hf_auto_refresh', '1');
+      localStorage.setItem('hf_auto_refresh_sec', String(sec));
+      setAutoStatus(true);
+    }
+
+    function stopAutoRefresh() {
+      if (autoTimer) {
+        clearInterval(autoTimer);
+        autoTimer = null;
+      }
+      localStorage.setItem('hf_auto_refresh', '0');
+      setAutoStatus(false);
+    }
+
+    function upsertChart(dates, closes, ma5, ma10, ma20) {
+      const ctx = el('priceChart');
+      const data = {
+        labels: dates,
+        datasets: [
+          { label: '收盘价', data: closes, borderColor: '#1d3557', backgroundColor: 'rgba(29,53,87,0.08)', borderWidth: 2.2, tension: 0.25, pointRadius: 0, fill: true },
+          { label: 'MA5', data: ma5, borderColor: '#d62828', borderWidth: 1.6, tension: 0.2, pointRadius: 0 },
+          { label: 'MA10', data: ma10, borderColor: '#f77f00', borderWidth: 1.6, tension: 0.2, pointRadius: 0 },
+          { label: 'MA20', data: ma20, borderColor: '#2a9d8f', borderWidth: 1.6, tension: 0.2, pointRadius: 0 },
+        ]
+      };
+      if (!priceChart) {
+        priceChart = new Chart(ctx, {
+          type: 'line',
+          data,
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: { legend: { position: 'top' } },
+            scales: { x: { ticks: { maxTicksLimit: 8 }, grid: { display: false } }, y: { grid: { color: 'rgba(0,0,0,0.06)' } } }
+          }
+        });
+      } else {
+        priceChart.data = data;
+        priceChart.update('none');
+      }
+    }
+
+    function renderIndices(indices, stock) {
+      const tbody = el('indexTbody');
+      tbody.innerHTML = '';
+      const rows = [
+        ['上证指数', indices['上证指数']],
+        ['深证成指', indices['深证成指']],
+        ['创业板指', indices['创业板指']],
+        ['沪深300', indices['沪深300']],
+      ];
+      for (const [name, d] of rows) {
+        const pct = Number(d?.pct || 0);
+        const cls = pct > 0 ? 'rise' : (pct < 0 ? 'fall' : '');
+        tbody.insertAdjacentHTML('beforeend', `<tr><td>${name}</td><td>${fmt(d?.price,2)}</td><td class="${cls}">${fmtPct(pct)}</td><td>市场基准</td></tr>`);
+      }
+      const sCls = Number(stock.pct) > 0 ? 'rise' : (Number(stock.pct) < 0 ? 'fall' : '');
+      tbody.insertAdjacentHTML('beforeend', `<tr><td>${stock.name}</td><td>${fmt(stock.price,2)}</td><td class="${sCls}">${fmtPct(stock.pct)}</td><td>目标标的</td></tr>`);
+    }
+
+    function renderTech(stock) {
+      const html = [
+        `<li><span>RSI14：</span>${fmt(stock.rsi14,1)}</li>`,
+        `<li><span>第一压力：</span>${fmt(stock.pressure_1,2)}</li>`,
+        `<li><span>第一支撑：</span>${fmt(stock.support_1_low,2)} - ${fmt(stock.support_1_high,2)}</li>`,
+        `<li><span>PE：</span>${fmt(stock.pe,2)}</li>`,
+        `<li><span>PB：</span>${fmt(stock.pb,2)}</li>`,
+        `<li><span>总市值：</span>${fmtYi(stock.mktcap_yi)}</li>`,
+      ];
+      el('techList').innerHTML = html.join('');
+    }
+
+    function renderFlow(flow, stock) {
+      const main = Number(flow.main_in_yi || 0);
+      const ddx5 = Number(flow.ddx5 || 0);
+      el('flowKpi').innerHTML = [
+        `主力净流入：<span class="${main>=0?'rise':'fall'}">${main>=0?'+':''}${main.toFixed(2)}亿</span>`,
+        `DDX5：<span class="${ddx5>=0?'rise':'fall'}">${ddx5>=0?'+':''}${ddx5.toFixed(3)}</span>`,
+        `DDX10：${fmt(flow.ddx10,3)}`,
+        `5日涨幅：${fmtPct(stock.chg5)}`,
+        `20日涨幅：${fmtPct(stock.chg20)}`,
+        `融资余额：${fmtYi(flow.margin_yi)}`,
+      ].map(s => `<div class="kpi-chip">${s}</div>`).join('');
+
+      let text = '资金解读：';
+      if (main > 0 && ddx5 > 0) {
+        text += '主力与结构指标同向偏多，短线有继续活跃基础。';
+      } else if (main < 0 && ddx5 < 0) {
+        text += '主力和结构指标均偏弱，需防冲高回落。';
+      } else {
+        text += '资金分歧较大，更多是博弈盘。';
+      }
+      el('flowSignalBox').textContent = text;
+    }
+
+    function renderFinancial(fin) {
+      const ann = fin.annual || {};
+      const q = fin.quarter || {};
+      const lf = fin.latest_fi || {};
+      const tbody = el('finTbody');
+      tbody.innerHTML = '';
+
+      tbody.insertAdjacentHTML('beforeend', `<tr><td>年报</td><td>${ann.end_date || '--'}</td><td>${ann.revenue ? (ann.revenue/1e8).toFixed(2)+'亿' : '--'}</td><td>${ann.n_income ? (ann.n_income/1e8).toFixed(2)+'亿' : '--'}</td><td>营收 ${fmtPct(ann.rev_yoy)} / 净利 ${fmtPct(ann.ni_yoy)}</td><td>ROE ${fmt(ann.roe,2)}%</td></tr>`);
+      tbody.insertAdjacentHTML('beforeend', `<tr><td>最新季报</td><td>${q.period_label || q.end_date || '--'}</td><td>${q.revenue ? (q.revenue/1e8).toFixed(2)+'亿' : '--'}</td><td>${q.n_income ? (q.n_income/1e8).toFixed(2)+'亿' : '--'}</td><td>营收 ${fmtPct(q.rev_yoy)} / 净利 ${fmtPct(q.ni_yoy)}</td><td>毛利率 ${fmt(q.gross,2)}%</td></tr>`);
+      tbody.insertAdjacentHTML('beforeend', `<tr><td>财务结构</td><td>${lf.end_date || '--'}</td><td>-</td><td>-</td><td>-</td><td>负债率 ${fmt(lf.debt,2)}% / PB ${fmt(lf.pb,2)}</td></tr>`);
+    }
+
+    function renderPolicy(notes) {
+      el('policyList').innerHTML = (notes || []).map(n => `<li>${n}</li>`).join('');
+    }
+
+    function renderHotInfo(info) {
+      el('hotTags').innerHTML = ['事件催化', '资金结构', '风险标记'].map(t => `<span class="tag">${t}</span>`).join('');
+      el('hotList').innerHTML = (info.event_drivers || []).map(x => `<li>${x}</li>`).join('');
+      el('hotCapital').textContent = `核心资金解读：${info.capital_interpretation || '--'}`;
+      el('hotRisk').innerHTML = (info.risk_flags || []).map(x => `<li>${x}</li>`).join('');
+    }
+
+    function renderFactTimeline(factFlow) {
+      const summary = factFlow?.summary || {};
+      const dedupStats = factFlow?.dedup_stats || {};
+      const topicGroups = Array.isArray(factFlow?.topic_groups) ? factFlow.topic_groups : [];
+      const rules = Array.isArray(factFlow?.credibility_rules) ? factFlow.credibility_rules : [];
+      const events = Array.isArray(factFlow?.events) ? factFlow.events : [];
+      el('factSummary').textContent = `近30天事实事件：${summary.total ?? 0} 条，高影响：${summary.high_impact ?? 0} 条，平均可信度：${summary.avg_credibility ?? '--'}`;
+      el('dedupSummary').textContent = `去重统计：原始 ${dedupStats.raw_total ?? 0} 条，去重后 ${dedupStats.dedup_total ?? 0} 条，已剔除重复 ${dedupStats.removed ?? 0} 条`;
+      el('topicGroupList').innerHTML = topicGroups.map(g => `<li>主题 ${g.topic || '--'}：${g.count ?? 0} 条，最高影响 ${g.top_impact || '--'}，最近时间 ${g.latest_time || '--'}</li>`).join('') || '<li>暂无同题归并结果</li>';
+      el('credibilityRuleList').innerHTML = rules.map(r => `<li>${r.rule || '--'}：${r.score_range || '--'}（${r.description || '--'}）</li>`).join('') || '<li>暂无可信度规则</li>';
+
+      const tbody = el('factTbody');
+      tbody.innerHTML = '';
+      if (!events.length) {
+        tbody.innerHTML = '<tr><td colspan="6">暂无事件数据</td></tr>';
+        return;
+      }
+
+      for (const e of events) {
+        const lvl = e.impact_level || '--';
+        const cls = lvl === '高' ? 'high' : (lvl === '中' ? 'mid' : 'low');
+        const title = e.url ? `<a href="${e.url}" target="_blank" rel="noopener noreferrer">${e.title || '--'}</a>` : (e.title || '--');
+        const scoreText = `${e.credibility_score ?? '--'}${e.credibility_reason ? `（${e.credibility_reason}）` : ''}`;
+        tbody.insertAdjacentHTML('beforeend', `
+          <tr>
+            <td>${e.time || '--'}</td>
+            <td>${e.event_type || '--'}</td>
+            <td>${title}</td>
+            <td>${e.source || '--'}</td>
+            <td><span class="badge ${cls}">${lvl}</span></td>
+            <td>${scoreText}</td>
+          </tr>
+        `);
+      }
+    }
+
+    function renderShortCore(info) {
+      const theme = info?.theme || {};
+      const flow = info?.money_flow || {};
+      const trend = info?.trend || {};
+      const riskLevel = info?.risk_level || '--';
+      const actionBias = info?.action_bias || '--';
+      const scenario = info?.current_scenario || {};
+      const points = Array.isArray(info?.core_points) ? info.core_points : [];
+      const watch = Array.isArray(info?.watch_next_1_3d) ? info.watch_next_1_3d : [];
+
+      const chipColor = scenario.color || 'amber';
+      el('scenarioHeadline').textContent = `当前情景：${scenario.name || '--'}`;
+      el('scenarioSummary').textContent = `评分 ${scenario.score ?? '--'} | 未来 1-3 天优先按当前情景做预案，不做单边想象。`;
+      el('scenarioChip').textContent = `策略信号：${scenario.name || '--'}`;
+      el('scenarioChip').className = `scenario-chip ${chipColor}`;
+      el('shortTopic').textContent = theme.main_topic || '--';
+      el('shortBias').textContent = actionBias;
+      el('shortRisk').textContent = riskLevel;
+      el('shortFlowState').textContent = flow.state || '--';
+      el('scenarioReasons').innerHTML = (Array.isArray(scenario.reasons) ? scenario.reasons : []).map(x => `<li>${x}</li>`).join('') || '<li>暂无判定依据</li>';
+      el('scenarioAction').textContent = `当前建议：${scenario.next_action || '--'}`;
+
+      el('shortCoreKpi').innerHTML = [
+        `主线题材：${theme.main_topic || '--'}（热度 ${theme.topic_heat || '--'}）`,
+        `资金态度：${flow.state || '--'}（主力 ${fmt(flow.main_in_yi,2)}亿 / DDX5 ${fmt(flow.ddx5,3)}）`,
+        `风险等级：${riskLevel}`,
+        `相对强度：${fmtPct(trend.relative_strength_pct)}`,
+        `RSI14：${fmt(trend.rsi14,1)}`,
+        `观察位：支撑 ${fmt(trend.support_1,2)} / 压力 ${fmt(trend.pressure_1,2)}`,
+      ].map(s => `<div class="kpi-chip">${s}</div>`).join('');
+
+      el('shortCorePoints').innerHTML = points.map(x => `<li>${x}</li>`).join('') || '<li>暂无核心结论</li>';
+      el('shortCoreWatch').innerHTML = watch.map(x => `<li>后续关注：${x}</li>`).join('') || '<li>暂无观察项</li>';
+    }
+
+    function renderMultiAngle(multi) {
+      const grid = el('multiAngleGrid');
+      if (!multi) {
+        grid.innerHTML = '<div class="card">暂无多角度解读数据</div>';
+        return;
+      }
+
+      const sec = (title, block) => {
+        const summary = block?.summary || '--';
+        const points = Array.isArray(block?.points) ? block.points : [];
+        const facts = Array.isArray(block?.facts) ? block.facts : [];
+        const source = block?.data_source || '--';
+        const list = points.map(p => `<li>${p}</li>`).join('');
+        const factList = facts.map(p => `<li>${p}</li>`).join('');
+        return `
+          <div class="card">
+            <h3 style="margin-top:0">${title}</h3>
+            <div class="note">${summary}</div>
+            <div class="fact-box">
+              <div class="fact-title">事实依据</div>
+              <ul class="list">${factList || '<li>--</li>'}</ul>
+              <div class="source-line">数据来源：${source}</div>
+            </div>
+            <ul class="list">${list}</ul>
+          </div>
+        `;
+      };
+
+      const scenario = multi.scenario || {};
+      const scenarioFacts = Array.isArray(scenario.facts) ? scenario.facts : [];
+      const scenarioFactList = scenarioFacts.map(p => `<li>${p}</li>`).join('');
+      const scenarioCard = `
+        <div class="card">
+          <h3 style="margin-top:0">情景化策略</h3>
+          <div class="note">${scenario.summary || '--'}</div>
+          <div class="fact-box">
+            <div class="fact-title">事实依据</div>
+            <ul class="list">${scenarioFactList || '<li>--</li>'}</ul>
+            <div class="source-line">数据来源：${scenario.data_source || '--'}</div>
+          </div>
+          <ul class="list">
+            <li><strong>偏强情景：</strong>${scenario.bull || '--'}</li>
+            <li><strong>中性情景：</strong>${scenario.base || '--'}</li>
+            <li><strong>偏弱情景：</strong>${scenario.bear || '--'}</li>
+          </ul>
+        </div>
+      `;
+
+      grid.innerHTML = [
+        sec('政策角度', multi.policy),
+        sec('行业角度', multi.industry),
+        sec('基本面角度', multi.fundamental),
+        sec('技术行为角度', multi.technical),
+        sec('情绪舆情角度', multi.sentiment),
+        scenarioCard,
+      ].join('');
+    }
+
+    function renderKpi(stock) {
+      el('kpiPrice').textContent = fmt(stock.price,2);
+      el('kpiPct').textContent = fmtPct(stock.pct);
+      el('kpi5d').textContent = fmtPct(stock.chg5);
+      el('kpi20d').textContent = fmtPct(stock.chg20);
+      setColorBySign(el('kpiPct'), stock.pct);
+      setColorBySign(el('kpi5d'), stock.chg5);
+      setColorBySign(el('kpi20d'), stock.chg20);
+    }
+
+    function clearDashboard(message) {
+      el('title').textContent = '盘中股票可视化分析';
+      el('kpiPrice').textContent = '--';
+      el('kpiPct').textContent = '--';
+      el('kpi5d').textContent = '--';
+      el('kpi20d').textContent = '--';
+      el('techList').innerHTML = '<li><span>提示：</span>暂无数据</li>';
+      el('indexTbody').innerHTML = '<tr><td colspan="4">暂无市场数据</td></tr>';
+      el('flowKpi').innerHTML = '<div class="kpi-chip">暂无资金数据</div>';
+      el('flowSignalBox').textContent = '资金解读：暂无数据';
+      el('finTbody').innerHTML = '<tr><td colspan="6">暂无财报数据</td></tr>';
+      el('policyList').innerHTML = '<li>暂无政策线索</li>';
+      el('hotTags').innerHTML = '';
+      el('hotList').innerHTML = '<li>暂无热度事件</li>';
+      el('hotCapital').textContent = '核心资金解读：--';
+      el('hotRisk').innerHTML = '<li>暂无风险标记</li>';
+      el('scenarioHeadline').textContent = '当前情景：--';
+      el('scenarioSummary').textContent = '--';
+      el('scenarioChip').textContent = '策略信号：--';
+      el('scenarioChip').className = 'scenario-chip amber';
+      el('shortTopic').textContent = '--';
+      el('shortBias').textContent = '--';
+      el('shortRisk').textContent = '--';
+      el('shortFlowState').textContent = '--';
+      el('scenarioReasons').innerHTML = '<li>暂无判定依据</li>';
+      el('scenarioAction').textContent = '--';
+      el('shortCoreKpi').innerHTML = '<div class="kpi-chip">暂无短期核心信息</div>';
+      el('shortCorePoints').innerHTML = '<li>暂无核心结论</li>';
+      el('shortCoreWatch').innerHTML = '<li>暂无观察项</li>';
+      el('factSummary').textContent = '--';
+      el('dedupSummary').textContent = '--';
+      el('topicGroupList').innerHTML = '<li>暂无同题归并结果</li>';
+      el('factTbody').innerHTML = '<tr><td colspan="6">暂无事件数据</td></tr>';
+      el('credibilityRuleList').innerHTML = '<li>暂无可信度规则</li>';
+      el('multiAngleGrid').innerHTML = '<div class="card">暂无多角度解读数据</div>';
+      if (priceChart) {
+        priceChart.destroy();
+        priceChart = null;
+      }
+      if (message) {
+        el('apiHint').textContent = message;
+      }
+    }
+
+    async function loadStock(query, showError=true) {
+      const q = (query || '').trim();
+      if (!q) return;
+      currentQuery = q;
+      localStorage.setItem('hf_last_query', q);
+      el('stockInput').value = q;
+      updateTimeLabel();
+
+      try {
+        const url = buildApiUrl(q);
+        const headers = currentApiKey ? { 'X-API-Key': currentApiKey } : {};
+        const resp = await fetch(url, { cache: 'no-store', headers });
+        const data = await resp.json();
+        if (!data.ok) throw new Error(data.error || '接口返回错误');
+
+        const s = data.stock;
+        el('title').textContent = `${s.name}（${s.code}）盘中可视化分析`;
+        el('apiHint').textContent = `数据时间：${data.ts} | 来源：本地接口`;
+
+        renderKpi(s);
+        renderTech(s);
+        renderIndices(data.indices || {}, s);
+        renderFlow(data.capital_flow || {}, s);
+        renderFinancial(data.financial || {});
+        renderPolicy(data.policy_notes || []);
+        renderHotInfo(data.hot_core_info || {});
+        renderShortCore(data.short_term_core_info || {});
+        renderFactTimeline(data.fact_event_timeline || {});
+        renderMultiAngle(data.multi_angle_interpretation || {});
+        upsertChart(data.chart.dates || [], data.chart.closes || [], data.chart.ma5 || [], data.chart.ma10 || [], data.chart.ma20 || []);
+      } catch (err) {
+        clearDashboard(`接口异常：${err.message}`);
+      }
+    }
+
+    el('loadBtn').addEventListener('click', () => loadStock(el('stockInput').value));
+    el('saveApiBtn').addEventListener('click', () => saveApiSettings());
+    el('stockInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') loadStock(el('stockInput').value);
+    });
+    el('refreshNowBtn').addEventListener('click', () => loadStock(currentQuery));
+    el('toggleAutoBtn').addEventListener('click', () => autoTimer ? stopAutoRefresh() : startAutoRefresh());
+    el('intervalSelect').addEventListener('change', () => { if (autoTimer) startAutoRefresh(); });
+
+    const savedSec = localStorage.getItem('hf_auto_refresh_sec');
+    const savedOn = localStorage.getItem('hf_auto_refresh') === '1';
+    loadApiSettings();
+    if (savedSec && ['15', '30', '60', '120'].includes(savedSec)) {
+      el('intervalSelect').value = savedSec;
+    }
+    if (savedOn) startAutoRefresh(); else setAutoStatus(false);
+
+    loadStock(currentQuery, false);
+  </script>
+</body>
+</html>
