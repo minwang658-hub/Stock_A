@@ -12,7 +12,7 @@ import pandas as pd
 import tushare as ts
 
 _token = os.environ.get("TUSHARE_TOKEN", "").strip()
-_api_url = os.environ.get("TUSHARE_API_URL", "http://121.40.135.59:8010/").strip()
+_api_url = os.environ.get("TUSHARE_API_URL", "http://api.tushare.pro").strip()
 _pro = None
 
 def get_pro():
@@ -163,11 +163,8 @@ def get_financial(codes_list):
                         "revenue": float(q0["total_revenue"]) if nv(q0.get("total_revenue")) else None,
                         "n_income": float(q0["n_income"]) if nv(q0.get("n_income")) else None,
                     }
-                    # 季报同比（与去年同期同季度比，如 Q3 2025 vs Q3 2024）
-                    # 按月份匹配，而非简单取下一行
-                    # 上年同期：保持8位格式 YYYYMMDD
                     cur_year = int(period[:4])
-                    prev_year_period = "%d%s" % (cur_year - 1, period[4:])  # "20250930" → "20240930"
+                    prev_year_period = "%d%s" % (cur_year - 1, period[4:])
                     q_prev_row = inc_q[inc_q["end_date"].astype(str) == prev_year_period]
                     if not q_prev_row.empty:
                         qp = q_prev_row.iloc[0]
@@ -175,7 +172,6 @@ def get_financial(codes_list):
                             quarter["rev_yoy"] = round((float(q0["total_revenue"]) - float(qp["total_revenue"])) / float(qp["total_revenue"]) * 100, 1)
                         if nv(q0.get("n_income")) and nv(qp.get("n_income")) and float(qp["n_income"]) != 0:
                             quarter["ni_yoy"] = round((float(q0["n_income"]) - float(qp["n_income"])) / float(qp["n_income"]) * 100, 1)
-                    # 对应期间 fina_indicator
                     fi_q = fi[fi["end_date"].astype(str) == period]
                     if not fi_q.empty:
                         fq = fi_q.iloc[0]
