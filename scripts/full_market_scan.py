@@ -283,53 +283,40 @@ def tx_daily_klines(code, count=300):
         return []
 
 # ─────────────────────────────────────────────
-# Tushare财务数据
+# akshare 财务数据
 # ─────────────────────────────────────────────
 
 def get_financial_data(codes, timeout=20):
-    """获取财务数据（Tushare），带超时控制"""
-    import signal
-    
-    def timeout_handler(signum, frame):
-        raise TimeoutError("Tushare API timeout")
-    
+    """获取财务数据（akshare），带批次控制"""
     results = {}
-    
+
     # 批量获取
     batch_size = 50
     total_batches = (len(codes) + batch_size - 1) // batch_size
-    
+
     for i in range(0, len(codes), batch_size):
         batch = codes[i:i+batch_size]
         batch_num = i // batch_size + 1
-        
+
         try:
-            # 设置超时
-            signal.signal(signal.SIGALRM, timeout_handler)
-            signal.alarm(timeout)  # 20秒超时
-            
             from tushare_data import get_financial
-            ts_data = get_financial(batch)
-            
-            signal.alarm(0)  # 取消超时
-            
-            for code, data in ts_data.items():
-                ann = data.get('annual', {})
+            ak_data = get_financial(batch)
+
+            for code, data in ak_data.items():
+                ann = data.get('annual') or {}
                 results[code] = {
-                    'roe': ann.get('roe', 0) or 0,
+                    'roe':         ann.get('roe', 0) or 0,
                     'gross_margin': ann.get('gross', 0) or 0,
-                    'net_margin': ann.get('netprofit_margin', 0) or 0,
-                    'debt_ratio': ann.get('debt_ratio', 0) or 0,
+                    'net_margin':  ann.get('net_margin', 0) or 0,
+                    'debt_ratio':  ann.get('debt', 0) or 0,
                 }
-            print(f"  ✅ 批次{batch_num}/{total_batches}: 财务数据获取成功 ({len(ts_data)}只)")
-            
-        except TimeoutError:
-            print(f"  ⚠️ 批次{batch_num}: Tushare超时，跳过")
+            print(f"  ✅ 批次{batch_num}/{total_batches}: 财务数据获取成功 ({len(ak_data)}只)")
+
         except Exception as e:
             print(f"  ⚠️ 批次{batch_num}: 财务数据获取失败: {e}")
-        
+
         time.sleep(0.3)
-    
+
     print(f"  📊 财务数据获取完成: {len(results)}/{len(codes)} 只")
     return results
 

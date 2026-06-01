@@ -2,11 +2,10 @@
 # -*- coding: utf-8 -*-
 """
 关注股票晨报生成脚本
-数据源：Tushare Pro (股票列表) + 腾讯财经 (实时行情)
+数据源：腾讯财经（实时行情）
 """
 
 import urllib.request
-import tushare as ts
 import time
 from datetime import datetime
 import os
@@ -22,17 +21,6 @@ REPORT_DIR = BASE_DIR / "reports"
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_DIR.mkdir(parents=True, exist_ok=True)
 
-# ============ Tushare配置 ============
-_token = os.environ.get("TUSHARE_TOKEN", "").strip()
-_api_url = os.environ.get("TUSHARE_API_URL", "http://121.40.135.59:8010/")
-
-if not _token:
-    raise RuntimeError("Missing TUSHARE_TOKEN environment variable")
-
-# 初始化
-pro = ts.pro_api(_token)
-pro._DataApi__http_url = _api_url
-
 # ============ 自选股池 ============
 STOCKS = {
     '600519': '贵州茅台', '300750': '宁德时代', '002594': '比亚迪',
@@ -44,9 +32,9 @@ STOCKS = {
 
 HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
 
-# ============ Tushare获取自选股列表 ============
+# ============ 获取自选股列表 ============
 def get_watchlist_from_tushare():
-    """从Tushare获取自选股最新行情"""
+    """从腾讯财经获取自选股最新行情"""
     stocks = []
     codes = list(STOCKS.keys())
     
@@ -126,7 +114,7 @@ def generate_report(stocks):
     md = f"# 📊 关注股票晨报\n\n"
     md += f"**日期：** {today}\n"
     md += f"**生成时间：** {now_str}\n"
-    md += f"**数据源：** Tushare Pro + 腾讯财经\n\n"
+    md += f"**数据源：** 腾讯财经\n\n"
     md += "---\n\n"
     md += "## 持仓行情\n\n"
     md += "| 代码 | 名称 | 现价 | 涨跌% | 支撑1 | 支撑2 | 压力1 | 压力2 |\n"
@@ -172,7 +160,7 @@ def generate_report(stocks):
 
 # ============ 主程序 ============
 def main():
-    print("📡 正在从Tushare Pro拉取自选股数据...")
+    print("📡 正在从腾讯财经拉取自选股数据...")
     
     stocks = get_watchlist_from_tushare()
     print(f"✅ 获取到 {len(stocks)} 只股票数据")

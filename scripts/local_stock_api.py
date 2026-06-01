@@ -32,7 +32,7 @@ if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
 from comprehensive_data import tx_daily, tx_realtime_full, calc_rsi  # noqa: E402
-from tushare_data import get_financial, get_capital_flow, get_pro, to_ts  # noqa: E402
+from tushare_data import get_financial, get_capital_flow  # noqa: E402
 from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request  # noqa: E402
 from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
 from fastapi.responses import JSONResponse  # noqa: E402
@@ -131,14 +131,15 @@ def _load_name_code_map() -> dict[str, str]:
 
     mapping: dict[str, str] = {}
     try:
-        pro = get_pro()
-        df = pro.stock_basic(exchange="", list_status="L", fields="ts_code,symbol,name")
+        import akshare as ak
+        df = ak.stock_info_a_code_name()
+        # 返回列：code, name
         if df is not None and not df.empty:
             for r in df.to_dict("records"):
                 name = str(r.get("name") or "").strip()
-                sym = str(r.get("symbol") or "").strip()
-                if name and sym and len(sym) == 6 and sym.isdigit():
-                    mapping[name] = sym
+                code = str(r.get("code") or "").strip()
+                if name and code and len(code) == 6 and code.isdigit():
+                    mapping[name] = code
     except Exception:
         pass
 
@@ -324,26 +325,24 @@ def _recent_fact_events(code: str, name: str) -> dict:
     latest_ann_title = None
     latest_policy_title = None
     try:
-        pro = get_pro()
-        ts_code = to_ts(code)
-        today = datetime.now().strftime("%Y%m%d")
-        start_30d = (datetime.now().timestamp() - 30 * 86400)
-        start_30d_str = datetime.fromtimestamp(start_30d).strftime("%Y%m%d")
+        import akshare as ak
+        start_30d_dt = datetime.fromtimestamp(datetime.now().timestamp() - 30 * 86400)
 
-        # 1) 公司公告（事实强）
+        # 1) 公司公告（akshare 巨潮公告）
         try:
-            ann_df = pro.anns_d(
-                ts_code=ts_code,
-                start_date=start_30d_str,
-                end_date=today,
-                fields="ts_code,name,title,ann_date,url",
-            )
+            ann_df = ak.stock_notice_report(symbol=code, date=start_30d_dt.strftime("%Y%m%d"))
             if ann_df is not None and not ann_df.empty:
                 ann_rows = ann_df.head(8).to_dict("records")
                 for r in ann_rows:
-                    title = str(r.get("title") or "").strip()
-                    d = _fmt_ymd(str(r.get("ann_date") or ""))
-                    url = str(r.get("url") or "").strip()
+                    # 列名因版本而异，兼容多种
+                    title = str(
+                        r.get("公告标题") or r.get("title") or r.get("ann_title") or ""
+                    ).strip()
+                    ann_date = str(
+                        r.get("公告日期") or r.get("ann_date") or r.get("date") or ""
+                    ).strip()
+                    url = str(r.get("url") or r.get("公告链接") or "").strip()
+                    d = _fmt_ymd(ann_date.replace("-", "")) if ann_date else "--"
                     score, score_reason = _credibility_detail("cninfo", bool(url), "公司公告")
                     e = {
                         "event_type": "公司公告",
@@ -358,31 +357,59 @@ def _recent_fact_events(code: str, name: str) -> dict:
                     }
                     events.append(e)
                 if ann_rows:
-                    latest_ann_title = str(ann_rows[0].get("title") or "").strip() or None
+                    first = ann_rows[0]
+                    latest_ann_title = str(
+                        first.get("公告标题") or first.get("title") or first.get("ann_title") or ""
+                    ).strip() or None
         except Exception:
             pass
 
-        # 2) 政策/宏观新闻（按关键词筛）
+        # 2) 个股相关新闻（akshare 东方财富个股新闻）
+        try:
+            news_df = ak.stock_news_em(symbol=code)
+            if news_df is not None and not news_df.empty:
+                count = 0
+                for r in news_df.head(30).to_dict("records"):
+                    title = str(r.get("新闻标题") or r.get("title") or "").strip()
+                    pub_time = str(r.get("发布时间") or r.get("pub_time") or r.get("datetime") or "").strip()
+                    source = str(r.get("文章来源") or r.get("source") or r.get("src") or "eastmoney").strip()
+                    url = str(r.get("新闻链接") or r.get("url") or "").strip()
+                    score, score_reason = _credibility_detail(source, bool(url), "个股新闻")
+                    e = {
+                        "event_type": "个股新闻",
+                        "time": pub_time or "--",
+                        "title": title or "--",
+                        "source": source,
+                        "url": url or None,
+                        "impact_level": _level_from_title(title),
+                        "credibility_score": score,
+                        "credibility_reason": score_reason,
+                        "evidence": "东方财富个股新闻",
+                    }
+                    events.append(e)
+                    count += 1
+                    if count >= 8:
+                        break
+        except Exception:
+            pass
+
+        # 3) 政策/宏观新闻（akshare 财经新闻，按关键词筛）
         policy_kw = ["地产", "楼市", "住建", "房贷", "公积金", "保障房", "土地", "城中村"]
         try:
-            major_df = pro.major_news(
-                src="sina",
-                start_date=datetime.fromtimestamp(start_30d).strftime("%Y-%m-%d") + " 00:00:00",
-                end_date=datetime.now().strftime("%Y-%m-%d") + " 23:59:59",
-                fields="pub_time,src,title,content",
-            )
-            if major_df is not None and not major_df.empty:
-                for r in major_df.head(120).to_dict("records"):
-                    title = str(r.get("title") or "").strip()
-                    content = str(r.get("content") or "")
+            macro_df = ak.stock_news_main_sina()
+            if macro_df is not None and not macro_df.empty:
+                for r in macro_df.head(120).to_dict("records"):
+                    title = str(r.get("标题") or r.get("title") or "").strip()
+                    content = str(r.get("内容") or r.get("content") or "")
                     merged = f"{title} {content}"
                     if not any(k in merged for k in policy_kw):
                         continue
-                    source = str(r.get("src") or "major_news").strip()
+                    pub_time = str(r.get("发布时间") or r.get("pub_time") or "").strip()
+                    source = str(r.get("来源") or r.get("src") or "sina").strip()
                     score, score_reason = _credibility_detail(source, False, "政策新闻")
                     e = {
                         "event_type": "政策新闻",
-                        "time": str(r.get("pub_time") or "").strip() or "--",
+                        "time": pub_time or "--",
                         "title": title or "--",
                         "source": source,
                         "url": None,
@@ -395,42 +422,6 @@ def _recent_fact_events(code: str, name: str) -> dict:
                     if not latest_policy_title:
                         latest_policy_title = title or None
                     if len([x for x in events if x["event_type"] == "政策新闻"]) >= 6:
-                        break
-        except Exception:
-            pass
-
-        # 3) 个股相关新闻（名称/代码筛）
-        try:
-            news_df = pro.news(
-                start_date=datetime.fromtimestamp(start_30d).strftime("%Y-%m-%d") + " 00:00:00",
-                end_date=datetime.now().strftime("%Y-%m-%d") + " 23:59:59",
-                fields="datetime,src,title,content",
-            )
-            if news_df is not None and not news_df.empty:
-                matcher = [name, code, to_ts(code)]
-                count = 0
-                for r in news_df.head(200).to_dict("records"):
-                    title = str(r.get("title") or "").strip()
-                    content = str(r.get("content") or "")
-                    merged = f"{title} {content}"
-                    if not any(m and m in merged for m in matcher):
-                        continue
-                    source = str(r.get("src") or "news").strip()
-                    score, score_reason = _credibility_detail(source, False, "个股新闻")
-                    e = {
-                        "event_type": "个股新闻",
-                        "time": str(r.get("datetime") or "").strip() or "--",
-                        "title": title or "--",
-                        "source": source,
-                        "url": None,
-                        "impact_level": _level_from_title(title),
-                        "credibility_score": score,
-                        "credibility_reason": score_reason,
-                        "evidence": "公司名/代码命中新闻标题或正文",
-                    }
-                    events.append(e)
-                    count += 1
-                    if count >= 6:
                         break
         except Exception:
             pass
@@ -575,7 +566,7 @@ def build_stock_payload(code: str) -> dict:
 
     fundamental_view = {
         "summary": "营收有增长，但利润与ROE压力仍在，基本面修复质量需持续跟踪。",
-        "data_source": "tushare_data.get_financial 年报/季报/财务结构",
+        "data_source": "akshare 同花顺财务数据 年报/季报/财务结构",
         "facts": [
             f"年报营收同比 {_fmt_num(rev_yoy, 2, '%')}。",
             f"年报净利同比 {_fmt_num(ni_yoy, 2, '%')}。",

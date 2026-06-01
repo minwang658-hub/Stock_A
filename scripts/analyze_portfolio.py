@@ -2,11 +2,10 @@
 # -*- coding: utf-8 -*-
 """
 米米持仓精算分析器
-数据源：Tushare Pro (持仓) + 腾讯财经 (行情)
+数据源：腾讯财经（行情）
 """
 
 import urllib.request
-import tushare as ts
 import time
 from datetime import datetime
 import os
@@ -21,17 +20,6 @@ REPORT_DIR = BASE_DIR / "reports"
 # 确保目录存在（使用 resolve 确保绝对路径）
 DATA_DIR.resolve().mkdir(parents=True, exist_ok=True)
 REPORT_DIR.resolve().mkdir(parents=True, exist_ok=True)
-
-# ============ Tushare配置 ============
-_token = os.environ.get("TUSHARE_TOKEN", "").strip()
-_api_url = os.environ.get("TUSHARE_API_URL", "http://121.40.135.59:8010/")
-
-if not _token:
-    raise RuntimeError("Missing TUSHARE_TOKEN environment variable")
-
-# 初始化
-pro = ts.pro_api(_token)
-pro._DataApi__http_url = _api_url
 
 # ============ 持仓配置 ============
 PORTFOLIO_FILE = DATA_DIR / "portfolio.csv"
@@ -168,7 +156,7 @@ def generate_analysis(results, total_cost, total_market, total_pnl, total_pnl_pc
     md = f"# 📊 持仓分析报告\n\n"
     md += f"**日期：** {today}\n"
     md += f"**生成时间：** {now_str}\n"
-    md += f"**数据源：** Tushare Pro + 腾讯财经\n\n"
+    md += f"**数据源：** 腾讯财经\n\n"
     md += "---\n\n"
     md += f"## 持仓概况\n\n"
     md += f"| 指标 | 数值 |\n"
