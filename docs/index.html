@@ -456,6 +456,8 @@
     let currentApiBase = DEFAULT_API_BASE;
     let currentApiKey = '';
     let requestSeq = 0;
+    let consecutiveErrors = 0;
+    const MAX_ERRORS_BEFORE_STOP = 3;
 
     const el = (id) => document.getElementById(id);
     const fmt = (v, d=2) => (v === null || v === undefined || Number.isNaN(Number(v))) ? '--' : Number(v).toFixed(d);
@@ -878,6 +880,7 @@
         renderFactTimeline(data.fact_event_timeline || {});
         renderMultiAngle(data.multi_angle_interpretation || {});
         upsertChart(data.chart.dates || [], data.chart.closes || [], data.chart.ma5 || [], data.chart.ma10 || [], data.chart.ma20 || []);
+        consecutiveErrors = 0;
       } catch (err) {
         if (seq !== requestSeq) return;
         const msg = String(err?.message || err || '');
@@ -887,7 +890,13 @@
           await loadStock(q, showError, true);
           return;
         }
-        clearDashboard(`接口异常：${err.message}`);
+        consecutiveErrors++;
+        if (autoTimer && consecutiveErrors >= MAX_ERRORS_BEFORE_STOP) {
+          stopAutoRefresh();
+          clearDashboard(`接口连续失败 ${consecutiveErrors} 次，已自动停止刷新。错误：${err.message}`);
+        } else {
+          clearDashboard(`接口异常：${err.message}`);
+        }
       }
     }
 
