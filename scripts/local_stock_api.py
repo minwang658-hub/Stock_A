@@ -86,6 +86,7 @@ def _eastmoney_search(keyword: str) -> str | None:
 
 
 
+_EVENT_CACHE: dict[str, tuple[float, dict]] = {}
 _EVENT_CACHE_TTL_SEC = 60
 _NAME_CACHE: dict[str, tuple[float, dict[str, str]]] = {}
 _NAME_CACHE_TTL_SEC = 600
