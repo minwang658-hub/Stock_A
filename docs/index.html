@@ -481,8 +481,17 @@
       return s || DEFAULT_API_BASE;
     }
 
+    // 已废弃的旧地址列表，自动重置
+    const STALE_API_URLS = ['121.40.135.59', 'api.tushare.pro'];
+
     function loadApiSettings() {
-      currentApiBase = normalizeApiBase(getUrlParam('api') || localStorage.getItem('hf_api_base') || DEFAULT_API_BASE);
+      let saved = getUrlParam('api') || localStorage.getItem('hf_api_base') || DEFAULT_API_BASE;
+      // 如果 localStorage 里存的是旧的无效地址，自动重置
+      if (STALE_API_URLS.some(bad => saved.includes(bad))) {
+        saved = DEFAULT_API_BASE;
+        localStorage.setItem('hf_api_base', DEFAULT_API_BASE);
+      }
+      currentApiBase = normalizeApiBase(saved);
       currentApiKey = (getUrlParam('key') || localStorage.getItem('hf_api_key') || '').trim();
       el('apiBaseInput').value = currentApiBase;
       el('apiKeyInput').value = currentApiKey;
@@ -504,7 +513,7 @@
       el('apiBaseInput').value = currentApiBase;
       el('apiKeyInput').value = '';
       if (showHint) {
-        el('apiHint').textContent = '接口配置已重置为推荐公网地址，请重新点击“加载股票”。';
+        el('apiHint').textContent = '接口配置已重置为推荐公网地址，请重新点击"加载股票"。';
       }
     }
 
