@@ -17,6 +17,9 @@ from __future__ import annotations
 import os
 import re
 import time
+import urllib.request
+import urllib.parse
+import json as _json
 from datetime import datetime
 from pathlib import Path
 
@@ -47,7 +50,42 @@ NAME_TO_CODE = {
     "安徽建工": "600502",
 }
 
-_EVENT_CACHE: dict[str, tuple[float, dict]] = {}
+_SEARCH_CACHE: dict[str, tuple[float, str | None]] = {}
+_SEARCH_CACHE_TTL_SEC = 300
+
+
+def _eastmoney_search(keyword: str) -> str | None:
+    """Use EastMoney suggest API to resolve stock name keywords to 6-digit codes."""
+    now = time.time()
+    cache = _SEARCH_CACHE.get(keyword)
+    if cache and now - cache[0] <= _SEARCH_CACHE_TTL_SEC:
+        return cache[1]
+
+    result = None
+    try:
+        encoded = urllib.parse.quote(keyword)
+        url = (
+            f"https://searchapi.eastmoney.com/api/suggest/get"
+            f"?input={encoded}&type=14,22,15,2,10,13&token=REMILIAASSETTOKEN&count=5"
+        )
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            data = _json.loads(resp.read().decode("utf-8"))
+        items = data.get("QuotationCodeTable", {}).get("Data") or []
+        for item in items:
+            if item.get("Classify") == "AStock":
+                code = str(item.get("Code", "")).strip()
+                if code and len(code) == 6 and code.isdigit():
+                    result = code
+                    break
+    except Exception:
+        pass
+
+    _SEARCH_CACHE[keyword] = (now, result)
+    return result
+
+
+
 _EVENT_CACHE_TTL_SEC = 60
 _NAME_CACHE: dict[str, tuple[float, dict[str, str]]] = {}
 _NAME_CACHE_TTL_SEC = 600
@@ -130,7 +168,14 @@ def resolve_code(query: str) -> str | None:
     if compact in name_map:
         return name_map[compact]
 
-    return None
+    # 模糊匹配：名称包含关键词，优先较短的名称（更精确）
+    matches = [(name, code) for name, code in name_map.items() if q in name]
+    if matches:
+        matches.sort(key=lambda x: len(x[0]))
+        return matches[0][1]
+
+    # 最后尝试东方财富实时搜索（支持关键词/拼音/板块）
+    return _eastmoney_search(q)
 
 
 def _ma(values: list[float], period: int) -> list[float | None]:
@@ -204,7 +249,7 @@ def _fmt_ymd(date_s: str) -> str:
 def _normalize_title(title: str) -> str:
     t = (title or "").strip().lower()
     t = re.sub(r"\s+", "", t)
-    t = re.sub(r"[，。、“”‘’：:；;,.!?！？\-_/()（）\[\]{}<>《》|]+", "", t)
+    t = re.sub(r"[，。、""''：:；;,.!?！？\-_/()（）\[\]{}<>《》|]+", "", t)
     t = re.sub(r"\d{2,}", "#", t)
     return t[:40]
 
